@@ -26,6 +26,26 @@ function onResize() {
     }
 }
 
+function get_size(self, max_size, input_size){
+    var input_size = [7,6];
+    if (input_size[0] != max_size[0]) or (input_size[1] != max_size[1]){
+        if (input_size[0] > max_size[0]) or (input_size[1] > max_size[1]){
+            if (!(input_size[0]/input_size[1] > max_size[0]/max_size[1])){
+                resized_size=((int)(max_size[0]),(int)(max_size[0]*input_size[1]/input_size[0]));
+            } else {
+                resized_size=((int)(max_size[1]*input_size[0]/input_size[1]),(int)(max_size[1]));
+            }
+        }else {
+            if (!(input_size[0]/input_size[1] < max_size[0]/max_size[1])) {
+                resized_size=((int)(max_size[1]*input_size[0]/input_size[1]),(int)(max_size[1]));
+            } else {
+                resized_size=((int)(max_size[0]),(int)(max_size[0]*input_size[1]/input_size[0]));
+            }
+        }
+    } else { resized_size = input_size; }
+    return resized_size;
+}
+
 function draw() {
   // put drawing code here
 }
