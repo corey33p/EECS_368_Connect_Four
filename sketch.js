@@ -1,19 +1,6 @@
-let board = new Array(6); 
-for (let i = 0; i < 6; ++i) {
-    board[i] = [0,0,0,0,0,0,0];
-}
+let board = new Matrix(6,7); 
 let turn = 1;
 let boardScaleFactor = .93;
-
-// function printBoard(){
-    // let str="";
-    // for (let i = 0; i < 6; ++i){
-        // str+=(board[i]+'\n');
-    // }
-    // console.log(str);
-// }
-
-// printBoard();
 
 function setup() {
     refreshScreen();
@@ -35,7 +22,6 @@ function drawBoard() {
     strokeWeight(4);
     fill(255,255,0);
     rect(x_buffer, y_buffer, x_width, y_width);
-    //
 }
 
 function drawSlots(){
@@ -50,8 +36,8 @@ function drawSlots(){
     strokeWeight(4);
     for (let row = 1;row<=6;row++){
         for (let col = 1;col<=7;col++){
-            if (board[row-1][col-1] == -1){ fill(224,0,0); }
-            else if (board[row-1][col-1] == 1){ fill(0,0,0); }
+            if (board.matrix[row-1][col-1] == -1){ fill(224,0,0); }
+            else if (board.matrix[row-1][col-1] == 1){ fill(0,0,0); }
             else { fill(224,224,224); }
             center_x = x_buffer + col * x_step;
             displayRow = 7 - row;
@@ -84,12 +70,12 @@ function get_size(max_size){
 function doTurn(col){
     let row = 0;
     if (col >= 0 && col <7){
-        while (board[row][col] != 0) {
+        while (board.matrix[row][col] != 0) {
             row++;
             if (row == 6) {return false;}
         }
-        if (turn == 1){ board[row][col]=1; turn = -1; }
-        else { board[row][col]=-1; turn = 1; }
+        if (turn == 1){ board.matrix[row][col]=1; turn = -1; }
+        else { board.matrix[row][col]=-1; turn = 1; }
         return true;
     } else {
         return false;
@@ -115,53 +101,36 @@ function mouseClicked(event){
 }
 
 function checkWin(type){
-    // horizontal four in a row
-    for (let row = 0;row<6;row++){
-        consecutive_count = 0;
-        for (let col = 0;col<7;col++){
-            if (board[row][col]==type) { consecutive_count++; }
-            else {consecutive_count = 0; }
-            if (consecutive_count == 4) {return true;}
-        }
-    }
-    
-    // check vertical four in a row
-    for (let col = 0;col<7;col++){
-        consecutive_count = 0;
-        for (let row = 0;row<6;row++){
-            if (board[row][col]==type) { consecutive_count++; }
-            else {consecutive_count = 0; }
-            if (consecutive_count == 4) {return true;}
-        }
-    }
-    
-    // check NW to SE diagonal
-    for (let col = -3;col<3;col++){
-        consecutive_count = 0;
-        sub_col = col;
-        for (let row = 0;row<6;row++){
-            if (row>=0&&row<7&&sub_col>=0&&sub_col<7){
-                if (board[row][sub_col]==type) { consecutive_count++; }
-                else {consecutive_count = 0; }
-                if (consecutive_count == 4) {return true;}
-            }
-            sub_col++;
-        }
-    }
-    
-    // check NE to SW diagonal
-    for (let col = 3;col<12;col++){
-        consecutive_count = 0;
-        sub_col = col;
-        for (let row = 0;row<6;row++){
-            if (row>=0&&row<7&&sub_col>=0&&sub_col<7){
-                if (board[row][sub_col]==type) { consecutive_count++; }
-                else {consecutive_count = 0; }
-                if (consecutive_count == 4) {return true;}
-            }
-            sub_col--;
-        }
-    }
+    let padding = new Matrix([[4,4]]);
+    let currentPlayersPieces = board.filter(type);
+    // horizontal four in a row //
+    let filter =  new Matrix([[0,0,0,0],
+                              [1,1,1,1],
+                              [0,0,0,0],
+                              [0,0,0,0]]);
+    let check = currentPlayersPieces.conv2d(filter,padding,0);
+    if (check.any(type*4)) {return true; }
+    // vertical four in a row //
+    filter =  new Matrix([[0,1,0,0],
+                          [0,1,0,0],
+                          [0,1,0,0],
+                          [0,1,0,0]]);
+    check = currentPlayersPieces.conv2d(filter,padding,0);
+    if (check.any(type*4)) {return true; }
+    // diagonal NW to SE //
+    filter =  new Matrix([[1,0,0,0],
+                          [0,1,0,0],
+                          [0,0,1,0],
+                          [0,0,0,1]]);
+    check = currentPlayersPieces.conv2d(filter,padding,0);
+    if (check.any(type*4)) {return true; }
+    // diagonal NE to SW //
+    filter =  new Matrix([[0,0,0,1],
+                          [0,0,1,0],
+                          [0,1,0,0],
+                          [1,0,0,0]]);
+    check = currentPlayersPieces.conv2d(filter,padding,0);
+    if (check.any(type*4)) {return true; }
     return false;
 }
 
