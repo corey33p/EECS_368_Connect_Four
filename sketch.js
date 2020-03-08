@@ -107,26 +107,62 @@ function mouseClicked(event){
     else { success = doTurn(col); }
     if (success) {
         drawSlots();
+        win = checkWin(-1*turn);
+        console.log("win = "+win);
         return true;
     }
     return false;
 }
 
-function matrixMultiply(a,b){
-    if (a.length == b[0].length){
-        let ar = new Array(a.length);   
-        for (let i = 0; i < b.length; ++i) {
-            ar[i] = new Array(b[0].length);
-        }
-        for (let row = 0;row<a.length;row++){
-            sum = 0;
-            for (let col = 0;col<b[0].length;col++){
-                
-                
-}
-
 function checkWin(type){
+    // horizontal four in a row
+    for (let row = 0;row<6;row++){
+        consecutive_count = 0;
+        for (let col = 0;col<7;col++){
+            if (board[row][col]==type) { consecutive_count++; }
+            else {consecutive_count = 0; }
+            if (consecutive_count == 4) {return true;}
+        }
+    }
     
+    // check vertical four in a row
+    for (let col = 0;col<7;col++){
+        consecutive_count = 0;
+        for (let row = 0;row<6;row++){
+            if (board[row][col]==type) { consecutive_count++; }
+            else {consecutive_count = 0; }
+            if (consecutive_count == 4) {return true;}
+        }
+    }
+    
+    // check NW to SE diagonal
+    for (let col = -3;col<3;col++){
+        consecutive_count = 0;
+        sub_col = col;
+        for (let row = 0;row<6;row++){
+            if (row>=0&&row<7&&sub_col>=0&&sub_col<7){
+                if (board[row][sub_col]==type) { consecutive_count++; }
+                else {consecutive_count = 0; }
+                if (consecutive_count == 4) {return true;}
+            }
+            sub_col++;
+        }
+    }
+    
+    // check NE to SW diagonal
+    for (let col = 3;col<12;col++){
+        consecutive_count = 0;
+        sub_col = col;
+        for (let row = 0;row<6;row++){
+            if (row>=0&&row<7&&sub_col>=0&&sub_col<7){
+                if (board[row][sub_col]==type) { consecutive_count++; }
+                else {consecutive_count = 0; }
+                if (consecutive_count == 4) {return true;}
+            }
+            sub_col--;
+        }
+    }
+    return false;
 }
 
 function draw() {
